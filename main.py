@@ -12,15 +12,14 @@ ROUNDS = 500
 
 
 def get_raw_file():
-    # try:
-    #     subprocess.call(
-    #         ['powershell', f'adb shell am start {PKG_NAME}/{ACTIVITY_NAME}'], stdout=subprocess.PIPE
-    #     )
-    # except Exception as e:
-    #     print('Permission denied when starting application.\nPlease start the app manually.')
+    # subprocess.call(
+    #     ['powershell', f'adb shell am start {PKG_NAME}/{ACTIVITY_NAME}'], stdout=subprocess.PIPE
+    # )
+    print('start profiling ...')
     subprocess.call(
-        ['powershell', f'adb shell COLUMNS=512 top -d 1 -H -n {ROUNDS}|grep {PKG_NAME} >{PATH}out1.csv'],
+        ['powershell', f'adb shell COLUMNS=512 top -d 1 -H -n {ROUNDS}|grep {PKG_NAME} >{PATH}data\\out1.csv'],
         stdout=subprocess.PIPE)
+    print('profiling finished')
 
 
 def make_df(loc):
@@ -35,7 +34,7 @@ def make_df(loc):
         # print(len(res_thread),len(res_cpu))
     df = list(zip(res_thread, res_cpu))
     d = pd.DataFrame(df, columns=['thread', '%CPU'], index=None)
-    d.to_csv('out2.csv', index=False)
+    d.to_csv('./data/out2.csv', index=False)
 
 
 def analyze(loc):
@@ -56,7 +55,7 @@ def analyze(loc):
             max_count -= 1
             break
     simplified_data = pd.DataFrame(data_threads, index=None)
-    simplified_data.to_csv('out3.csv', index=False)
+    simplified_data.to_csv('./data/out3.csv', index=False)
     return max_count
 
 
@@ -114,7 +113,7 @@ def show_ori(res, n):
     ax.set_ylabel('CPU使用率')
     ax.set_title('各线程CPU使用率随时间变化曲线图')
     ax.legend()
-    plt.savefig('out.jpg')
+    plt.savefig('./data/out.jpg')
     plt.show()
 
 
@@ -127,17 +126,18 @@ if __name__ == '__main__':
 
     TEST_X20 = 0  # 若测试x20异常数据，则置1
     DO_COLLECT = 1  # 若不重新采集信息，则置零
+
     if not TEST_X20 and DO_COLLECT:
         get_raw_file()
 
     if not TEST_X20:
         # 获取了raw的data，若干k行
-        make_df('out1.csv')
+        make_df('./data/out1.csv')
         # 获取过滤后的raw data
-        cycles = analyze('out2.csv')
-        result = pd.read_csv('out3.csv')
+        cycles = analyze('./data/out2.csv')
+        result = pd.read_csv('./data/out3.csv')
     else:
-        result = pd.read_excel('out3test.xlsx')
+        result = pd.read_excel('./data/out3test.xlsx')
         cycles = 722
     # 频域图
     freq_dic = show_freq(result, cycles)  # {thread:[freq...]}

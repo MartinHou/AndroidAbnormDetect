@@ -1,3 +1,7 @@
 *.csv
 *.jpg
-!out1.csv
+*.txt
+*.data
+/binary_cache
+/cache
+!data/out1.csv
