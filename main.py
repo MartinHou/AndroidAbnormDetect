@@ -6,11 +6,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.fftpack import fft
 
-PKG_NAME = 'EpicLRT'
+PKG_NAME = 'com.EpicLRT.ActionRPGSample'
+ACTIVITY_NAME = 'com.epicgames.ue4.GameActivity'
 ROUNDS = 1000
 
 
 def get_raw_file():
+    subprocess.call(
+        ['powershell', f'adb shell am start {PKG_NAME}/{ACTIVITY_NAME}'], stdout=subprocess.PIPE
+    )
     subprocess.call(
         ['powershell', f'adb shell COLUMNS=512 top -d 1 -H -n {ROUNDS}|grep {PKG_NAME} >{PATH}out1.csv'],
         stdout=subprocess.PIPE)
@@ -19,7 +23,7 @@ def get_raw_file():
 def make_df(loc):
     with open(loc, 'r', encoding='utf-16') as file:
         da = file.read()
-        res_thread = re.findall(r'(?<=:\d{2}.\d{2} ).*(?= com.EpicLRT)', da)
+        res_thread = re.findall('(?<=:\\d{2}.\\d{2} ).*(?= %s)' % PKG_NAME, da)  # 此处包名需要修改
         res_cpu = re.findall(r'(?<= [SR] ) ?\d{1,3}.?\d+', da)
         res_thread = list(map(lambda x: x.strip(), res_thread))
         res_cpu = list(map(float, res_cpu))
