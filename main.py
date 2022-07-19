@@ -8,13 +8,16 @@ from scipy.fftpack import fft
 
 PKG_NAME = 'com.EpicLRT.ActionRPGSample'
 ACTIVITY_NAME = 'com.epicgames.ue4.GameActivity'
-ROUNDS = 1000
+ROUNDS = 500
 
 
 def get_raw_file():
-    subprocess.call(
-        ['powershell', f'adb shell am start {PKG_NAME}/{ACTIVITY_NAME}'], stdout=subprocess.PIPE
-    )
+    # try:
+    #     subprocess.call(
+    #         ['powershell', f'adb shell am start {PKG_NAME}/{ACTIVITY_NAME}'], stdout=subprocess.PIPE
+    #     )
+    # except Exception as e:
+    #     print('Permission denied when starting application.\nPlease start the app manually.')
     subprocess.call(
         ['powershell', f'adb shell COLUMNS=512 top -d 1 -H -n {ROUNDS}|grep {PKG_NAME} >{PATH}out1.csv'],
         stdout=subprocess.PIPE)
@@ -122,8 +125,8 @@ if __name__ == '__main__':
     cur_PATH = os.path.abspath(__file__)
     PATH = os.path.dirname(cur_PATH) + os.path.sep
 
-    TEST_X20 = 1  # 若测试x20异常数据，则置1
-    DO_COLLECT = 0  # 若不重新采集信息，则置零
+    TEST_X20 = 0  # 若测试x20异常数据，则置1
+    DO_COLLECT = 1  # 若不重新采集信息，则置零
     if not TEST_X20 and DO_COLLECT:
         get_raw_file()
 
