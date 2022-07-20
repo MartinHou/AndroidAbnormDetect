@@ -17,8 +17,11 @@ def get_raw_file():
     # )
     print('start profiling ...')
     subprocess.call(
-        ['powershell', f'adb shell COLUMNS=512 top -d 1 -H -n {ROUNDS}|grep {PKG_NAME} >{PATH}data\\out1.csv'],
+        ['powershell', f'adb shell COLUMNS=512 "top -d 1 -H -n {ROUNDS}|grep {PKG_NAME}" >{PATH}data\\out1.csv'],
         stdout=subprocess.PIPE)
+    '''
+    adb shell COLUMNS=512 top -d 1 -H -n 500|grep com.EpicLRT.ActionRPGSample >aaa.csv
+    '''
     print('profiling finished')
 
 
@@ -123,9 +126,10 @@ if __name__ == '__main__':
 
     cur_PATH = os.path.abspath(__file__)
     PATH = os.path.dirname(cur_PATH) + os.path.sep
+    # print(PATH)
 
     TEST_X20 = 0  # 若测试x20异常数据，则置1
-    DO_COLLECT = 1  # 若不重新采集信息，则置零
+    DO_COLLECT = 0  # 若不重新采集信息，则置零
 
     if not TEST_X20 and DO_COLLECT:
         get_raw_file()
@@ -146,4 +150,4 @@ if __name__ == '__main__':
     abnormal_res = abnormal(freq_dic)
     if abnormal_res:
         deliver_abnormal(abnormal_res, freq_dic)
-        show_ori(result, cycles)
+    show_ori(result, cycles)
