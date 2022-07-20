@@ -9,6 +9,9 @@ from scipy.fftpack import fft
 PKG_NAME = 'com.EpicLRT.ActionRPGSample'
 ACTIVITY_NAME = 'com.epicgames.ue4.GameActivity'
 ROUNDS = 500
+TEST_X20 = 1  # 若测试x20异常数据，则置1
+DO_COLLECT = 0  # 若不重新采集信息，则置零
+K = 23  # K越小，检测越严苛，更少异常会被容纳 （建议值：14~24）
 
 
 def get_raw_file():
@@ -19,9 +22,6 @@ def get_raw_file():
     subprocess.call(
         ['powershell', f'adb shell COLUMNS=512 "top -d 1 -H -n {ROUNDS}|grep {PKG_NAME}" >{PATH}data\\out1.csv'],
         stdout=subprocess.PIPE)
-    '''
-    adb shell COLUMNS=512 top -d 1 -H -n 500|grep com.EpicLRT.ActionRPGSample >aaa.csv
-    '''
     print('profiling finished')
 
 
@@ -91,7 +91,7 @@ def abnormal(dic):
         if b <= 0:
             print('数据采样点过少，请扩大采样点')
             break
-        elif a / b < 20:  # 最大值与平均值差大于两倍标准差
+        elif a / b < K:  # 最大值与平均值差大于两倍标准差
             res.append((thread, a / b))  # thread出现异常，界定值为a/b
     return res
 
@@ -128,9 +128,6 @@ if __name__ == '__main__':
     PATH = os.path.dirname(cur_PATH) + os.path.sep
     # print(PATH)
 
-    TEST_X20 = 0  # 若测试x20异常数据，则置1
-    DO_COLLECT = 0  # 若不重新采集信息，则置零
-
     if not TEST_X20 and DO_COLLECT:
         get_raw_file()
 
@@ -141,7 +138,7 @@ if __name__ == '__main__':
         cycles = analyze('./data/out2.csv')
         result = pd.read_csv('./data/out3.csv')
     else:
-        result = pd.read_excel('./data/out3test.xlsx')
+        result = pd.read_excel('./data/out3test-2.xlsx')
         cycles = 722
     # 频域图
     freq_dic = show_freq(result, cycles)  # {thread:[freq...]}

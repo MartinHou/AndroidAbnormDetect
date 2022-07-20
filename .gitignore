@@ -3,5 +3,5 @@
 *.txt
 *.data
 /binary_cache
-/cache
+/cache/*.txt
 !data/out1.csv

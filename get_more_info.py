@@ -4,6 +4,7 @@ import pandas as pd
 
 PKG_NAME = 'com.EpicLRT.ActionRPGSample'
 REPORT_PREFIX = 'python simpleperf/report.py '
+TIME = 30
 
 
 def strip_top(file_loc):
@@ -14,13 +15,13 @@ def strip_top(file_loc):
         file.write(dso)
 
 
-if __name__ == '__main__':
-    '''
+def main():
+    """
     进行一次监控，获取perf文件
-    '''
+    """
     monitor_on = 1  # 不采集则置零
     if monitor_on:
-        subprocess.call(['powershell', 'python ./simpleperf/app_profiler.py -p ' + PKG_NAME+' -r "--duration 30"'],
+        subprocess.call(['powershell', 'python ./simpleperf/app_profiler.py -p ' + PKG_NAME + f' -r "--duration {TIME}"'],
                         stdout=subprocess.PIPE)
 
     '''
@@ -65,3 +66,7 @@ if __name__ == '__main__':
         print('========最大耗时共享库的最大耗时函数耗时过长==========')
     elif eval(thread_time[:-1]) > 70:
         print('=========最大线程耗时占比过大===========')
+
+
+if __name__ == '__main__':
+    main()
